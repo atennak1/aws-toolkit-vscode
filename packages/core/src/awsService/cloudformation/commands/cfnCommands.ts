@@ -259,21 +259,16 @@ export async function promptForOptionalFlags(
 
             break
         case OptionalFlagMode.Input: {
-            const onStackFailure = fileFlags?.onStackFailure ?? (await getOnStackFailure(!!stackDetails))
-            const includeNestedStacks = fileFlags?.includeNestedStacks ?? (await getIncludeNestedStacks())
-            const importExistingResources = fileFlags?.importExistingResources ?? (await getImportExistingResources())
+            const deploymentMode = fileFlags?.deploymentMode ?? (await getDeploymentMode())
 
-            let deploymentMode = fileFlags?.deploymentMode
-            if (
-                !deploymentMode &&
-                shouldPromptForDeploymentMode(
-                    stackDetails,
-                    importExistingResources,
-                    includeNestedStacks,
-                    onStackFailure
-                )
-            ) {
-                deploymentMode = await getDeploymentMode()
+            let onStackFailure: OnStackFailure | undefined
+            let includeNestedStacks: boolean | undefined
+            let importExistingResources: boolean | undefined
+
+            if (deploymentMode !== DeploymentMode.REVERT_DRIFT) {
+                onStackFailure = fileFlags?.onStackFailure ?? (await getOnStackFailure(!!stackDetails))
+                includeNestedStacks = fileFlags?.includeNestedStacks ?? (await getIncludeNestedStacks())
+                importExistingResources = fileFlags?.importExistingResources ?? (await getImportExistingResources())
             }
 
             optionalFlags = {
